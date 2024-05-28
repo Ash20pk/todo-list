@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect } from 'react';
 import './App.css';
-import Web3 from 'web3';
+import { ethers } from 'ethers';
 import deleteIcon from './trash.png';
-import ABI from './contracts/TodoList'
+import ABI from './contracts/TodoList';
+import Loading from './Loading'; 
 
 // Create a context for the todo list
 const TodoListContext = createContext();
@@ -11,81 +12,103 @@ const TodoListContext = createContext();
 const TodoList = () => {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
-  const [web3, setWeb3] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
   const [contract, setContract] = useState(null);
-  const [accounts, setAccounts] = useState([]);
+  const [account, setAccount] = useState('');
   const [isConnected, setIsConnected] = useState(false);
-
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
+      const providerInstance = new ethers.BrowserProvider(window.ethereum);
+      setProvider(providerInstance);
     }
   }, []);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      if (isConnected && contract) {
+        setLoading(true); // Start loading
+        try {
+          const todoList = await contract.getTodos();
+          const processedTodos = todoList.map(([content, completed]) => ({ content, completed }));
+          setTodos(processedTodos);
+        } catch (error) {
+          console.error('Error fetching todos:', error);
+        }
+        setLoading(false); // Stop loading
+      }
+    };
+
+    fetchTodos();
+  }, [isConnected, contract]);
 
   const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
   const fetchTodos = async () => {
     try {
-      const todoList = await contract.methods.getTodos().call({from: accounts, gasLimit: 50000});
+      setLoading(true);
+      const todoList = await contract.getTodos();
       const processedTodos = todoList.map(([content, completed]) => ({ content, completed }));
       setTodos(processedTodos);
     } catch (error) {
       console.error('Error fetching todos:', error);
     }
+    setLoading(false);
   };
 
   const connectToMetaMask = async () => {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
-      const accounts = await web3.eth.getAccounts();
-      const account = accounts[0];
-      // const currentChainId = await window.ethereum.request({
-      //   method: 'eth_chainId',
-      // });
-      // if (currentChainId !== '0x13882') { // '0xaa36a7' is the chain ID for Sepolia Testnet
-      //   alert("Connect to Sepolia Testnet");
-      //   return;
-      // }
-      const instance = new web3.eth.Contract(ABI.abi, contractAddress);
+      const signerInstance = await provider.getSigner();
+      const accounts = await window.ethereum.request({ method: 'eth_accounts' })
+      const instance = new ethers.Contract(contractAddress, ABI.abi, signerInstance);
+      setSigner(signerInstance);
       setContract(instance);
-      console.log(account);
-      setAccounts(account);
+      setAccount(accounts[0]);
+      console.log(accounts[0]);
       setIsConnected(true);
-      fetchTodos();
     } catch (error) {
       console.error(error);
     }
   };
 
   const disconnectFromMetaMask = () => {
-    setAccounts([]);
+    setAccount('');
     setIsConnected(false);
   };
 
   const addTodo = async () => {
     if (newTodo.trim()) {
+      setLoading(true);
       console.log("Adding New Task");
-      await contract.methods.addTodo(newTodo).send({from: accounts, gasLimit: 50000});
+      const tx = await contract.addTodo(newTodo);
+      console.log(`Added: https://scan.test.btcs.network/tx/${tx.hash}`);
+      fetchTodos();
+      setLoading(false);
     }
   };
 
   const markAsCompleted = async (index) => {
-    await contract.methods.markAsCompleted(index).send({from: accounts, gasLimit: 50000});
-    fetchTodos(); 
-    const updatedTodos = [...todos];
-    setTodos(updatedTodos);
+    setLoading(true);
+    const tx = await contract.markAsCompleted(index);
+    console.log(`Marked as completed: https://scan.test.btcs.network/tx/${tx.hash}`);
+    fetchTodos();
+    setLoading(false);
   };
 
   const deleteTodo = async (index) => {
-    await contract.methods.deleteTodo(index).send({from: accounts, gasLimit: 50000});
-    const updatedTodos = [...todos];
-    setTodos(updatedTodos);
+    setLoading(true);
+    const tx = await contract.deleteTodo(index);
+    console.log(`Deleted: https://scan.test.btcs.network/tx/${tx.hash}`);
+    fetchTodos();
+    setLoading(false);
   };
 
   return (
     <TodoListContext.Provider value={{ todos, addTodo, markAsCompleted, deleteTodo, newTodo, setNewTodo }}>
+      {loading && <Loading />} {/* Display loading animation if loading */}
       <div className="metamask-buttons">
             {isConnected ? (
               <button className="metamask-disconnect" onClick={disconnectFromMetaMask}>
