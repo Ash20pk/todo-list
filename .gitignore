@@ -16,25 +16,3 @@ node_modules
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments
 
-# dependencies
-todo-app/node_modules
-todo-app/.pnp
-todo-app/.pnp.js
-
-# testing
-todo-app/coverage
-
-# production
-todo-app/build
-
-# misc
-todo-app/.DS_Store
-todo-app/.env.local
-todo-app/.env.development.local
-todo-app/.env.test.local
-todo-app/.env.production.local
-todo-app/.env
-
-todo-app/npm-debug.log*
-todo-app/yarn-debug.log*
-todo-app/yarn-error.log*

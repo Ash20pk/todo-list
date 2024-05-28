@@ -1,0 +1,128 @@
+@font-face {
+  font-family: 'notebook';
+  src: url('./Notebook.ttf'),
+}
+
+body {
+  font-family: 'notebook';
+  background-color: #f7e8c3;
+}
+
+.notebook {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.notebook-cover {
+  background-color: #b39c6b;
+  color: #fff;
+  padding: 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.notebook-title {
+  text-align: center;
+  font-size: 32px;
+  margin: 0;
+}
+
+.notebook-pages {
+  padding: 20px;
+}
+
+.todo-input {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.todo-input-field {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 25px;
+  resize: none;
+}
+
+.todo-add-button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.todo-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.todo-content {
+  display: flex;
+  align-items: center;
+}
+
+.todo-checkbox {
+  margin-right: 8px;
+}
+
+.todo-text {
+  font-size: 30px;
+}
+
+.todo-text.completed {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.todo-delete-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.delete-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.metamask-buttons {
+  display: flex;
+  justify-content: right;
+  margin-top: 16px;
+  margin-right: 10px;
+}
+
+.metamask-connect,
+.metamask-disconnect {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.metamask-disconnect {
+  background-color: #f44336;
+}
